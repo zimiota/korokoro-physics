@@ -33,7 +33,7 @@ export class SimulationView {
     this.running = false;
     this.params = null;
     this.currentTime = 0;
-    this.cameraMode = CAMERA_MODES.ANGLED;
+    this.cameraMode = CAMERA_MODES.SIDE_HIGH;
     this.rampNormal = new THREE.Vector3(0, 1, 0);
 
     this.addLights();
