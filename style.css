@@ -86,6 +86,14 @@ button {
   transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
+#start {
+  background: #22d3ee;
+}
+
+#start.pending-start {
+  background: linear-gradient(135deg, #22d3ee, #8b5cf6);
+}
+
 button:hover {
   transform: translateY(-1px);
   box-shadow: 0 10px 22px rgba(34, 211, 238, 0.35);
