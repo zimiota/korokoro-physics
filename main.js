@@ -69,7 +69,7 @@ function startSimulation() {
 function toggleCamera() {
   currentCamera = currentCamera === CAMERA_MODES.ANGLED ? CAMERA_MODES.SIDE : CAMERA_MODES.ANGLED;
   const params = getParams();
-  simView.setCamera(currentCamera, params.length, params.thetaRad);
+  simView.setCamera(currentCamera);
 }
 
 angleInput.addEventListener('input', () => {

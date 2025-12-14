@@ -20,6 +20,8 @@ export class SimulationView {
       200
     );
 
+    this.contentGroup = new THREE.Group();
+    this.scene.add(this.contentGroup);
     this.rampMesh = null;
     this.rampAxes = null;
     this.object = null;
@@ -50,10 +52,9 @@ export class SimulationView {
 
   createRamp(length, thetaRad) {
     if (this.rampMesh) {
-      this.scene.remove(this.rampMesh);
+      this.contentGroup.remove(this.rampMesh);
       if (this.rampAxes) {
         this.rampMesh.remove(this.rampAxes);
-        this.scene.remove(this.rampAxes);
         this.rampAxes = null;
       }
 
@@ -81,12 +82,12 @@ export class SimulationView {
 
     this.rampAxes = new THREE.AxesHelper(3);
     this.rampMesh.add(this.rampAxes);
-    this.scene.add(this.rampMesh);
+    this.contentGroup.add(this.rampMesh);
   }
 
   createObject(shape, radius) {
     if (this.object) {
-      this.scene.remove(this.object);
+      this.contentGroup.remove(this.object);
     }
 
     let geometry;
@@ -107,18 +108,12 @@ export class SimulationView {
     mesh.add(stripes);
 
     this.object = mesh;
-    this.scene.add(mesh);
+    this.contentGroup.add(mesh);
   }
 
-  setCamera(mode, length, thetaRad) {
+  setCamera(mode) {
     this.cameraMode = mode;
-    const height = Math.sin(thetaRad) * length;
-    if (mode === CAMERA_MODES.SIDE) {
-      this.camera.position.set(-length * 0.2, height * 0.6, length * 1.2);
-    } else {
-      this.camera.position.set(-length * 0.6, height * 0.6, length);
-    }
-    this.camera.lookAt(new THREE.Vector3(0, -height / 2, 0));
+    this.updateCameraFraming();
   }
 
   startRun(params) {
@@ -126,7 +121,7 @@ export class SimulationView {
     this.currentTime = 0;
     this.createRamp(params.length, params.thetaRad);
     this.createObject(params.shape, params.radius);
-    this.setCamera(this.cameraMode, params.length, params.thetaRad);
+    this.updateCameraFraming();
     this.running = true;
     this.clock.start();
   }
@@ -162,6 +157,39 @@ export class SimulationView {
   handleResize() {
     const { clientWidth, clientHeight } = this.container;
     this.camera.aspect = clientWidth / clientHeight;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(clientWidth, clientHeight);
+    this.updateCameraFraming();
+  }
+
+  updateCameraFraming() {
+    if (!this.rampMesh || !this.object) return;
+
+    const { clientWidth, clientHeight } = this.container;
+    this.camera.aspect = clientWidth / clientHeight;
+
+    const box = new THREE.Box3().setFromObject(this.contentGroup);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+
+    const padding = 1.35;
+    const paddedWidth = size.x * padding;
+    const paddedHeight = size.y * padding;
+    const paddedDepth = size.z * padding;
+
+    const halfFov = THREE.MathUtils.degToRad(this.camera.fov / 2);
+    const heightDistance = paddedHeight / (2 * Math.tan(halfFov));
+    const widthDistance = paddedWidth / (2 * Math.tan(halfFov) * this.camera.aspect);
+    const distance = Math.max(heightDistance, widthDistance) + paddedDepth * 0.5;
+
+    const angledDirection = new THREE.Vector3(-0.8, 0.45, 1).normalize();
+    const sideDirection = new THREE.Vector3(-0.25, 0.3, 1).normalize();
+    const offsetDirection = this.cameraMode === CAMERA_MODES.SIDE ? sideDirection : angledDirection;
+
+    const newPosition = center.clone().add(offsetDirection.multiplyScalar(distance));
+    this.camera.position.copy(newPosition);
+    this.camera.lookAt(center);
+
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(clientWidth, clientHeight);
   }
