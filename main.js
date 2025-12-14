@@ -72,7 +72,12 @@ function toggleCamera() {
   simView.setCamera(currentCamera, params.length, params.thetaRad);
 }
 
-[angleInput, distanceInput, diameterInput, thicknessInput].forEach((input) =>
+angleInput.addEventListener('input', () => {
+  updateDisplayValues();
+  startSimulation();
+});
+
+[distanceInput, diameterInput, thicknessInput].forEach((input) =>
   input.addEventListener('input', () => updateDisplayValues())
 );
 shapeSelect.addEventListener('change', () => {
