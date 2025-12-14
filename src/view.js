@@ -107,26 +107,67 @@ export class SimulationView {
       this.contentGroup.remove(this.object);
     }
 
-    let geometry;
-    if (shape.includes('Sphere')) {
-      geometry = new THREE.SphereGeometry(radius, 32, 32);
-    } else {
-      geometry = new THREE.CylinderGeometry(radius, radius, radius * 1.2, 48, 1);
-      geometry.rotateZ(Math.PI / 2);
-    }
-
-    const material = new THREE.MeshStandardMaterial({
-      color: 0xe6ecf3,
-      metalness: 1,
-      roughness: 0.05,
+    const metallicMaterial = new THREE.MeshStandardMaterial({
+      color: 0xaeb4be,
+      metalness: 0.9,
+      roughness: 0.25,
     });
-    const mesh = new THREE.Mesh(geometry, material);
 
-    // ラインで回転が見えるように装飾
-    const stripeMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
-    const stripeGeo = new THREE.EdgesGeometry(geometry);
-    const stripes = new THREE.LineSegments(stripeGeo, stripeMaterial);
-    mesh.add(stripes);
+    const isSphere = shape.includes('Sphere');
+    const isHollowCylinder = shape === 'hollowCylinder';
+    let mesh;
+
+    if (isHollowCylinder) {
+      const wallGeo = new THREE.CylinderGeometry(radius, radius, radius * 1.2, 48, 1, true);
+      wallGeo.rotateZ(Math.PI / 2);
+
+      const wallMaterial = metallicMaterial.clone();
+      wallMaterial.side = THREE.DoubleSide;
+      const wallMesh = new THREE.Mesh(wallGeo, wallMaterial);
+
+      const innerRadius = radius * 0.6;
+      const innerGeo = new THREE.CylinderGeometry(innerRadius, innerRadius, radius * 1.2, 32, 1, true);
+      innerGeo.rotateZ(Math.PI / 2);
+      const innerMaterial = new THREE.MeshStandardMaterial({
+        color: 0xe7ebf0,
+        metalness: 0.2,
+        roughness: 0.85,
+        side: THREE.DoubleSide,
+      });
+      const innerMesh = new THREE.Mesh(innerGeo, innerMaterial);
+
+      const capGeo = new THREE.RingGeometry(innerRadius, radius, 48, 1);
+      const capMaterial = metallicMaterial.clone();
+      capMaterial.side = THREE.DoubleSide;
+      const capFront = new THREE.Mesh(capGeo, capMaterial);
+      capFront.rotation.y = Math.PI / 2;
+      capFront.position.x = -radius * 0.6;
+      const capBack = capFront.clone();
+      capBack.position.x = radius * 0.6;
+
+      const stripesGeo = new THREE.EdgesGeometry(wallGeo);
+      const stripeMaterial = new THREE.LineBasicMaterial({ color: 0xf8fafc });
+      const stripes = new THREE.LineSegments(stripesGeo, stripeMaterial);
+
+      mesh = new THREE.Group();
+      mesh.add(wallMesh, innerMesh, capFront, capBack, stripes);
+    } else {
+      const geometry = isSphere
+        ? new THREE.SphereGeometry(radius, 32, 32)
+        : new THREE.CylinderGeometry(radius, radius, radius * 1.2, 48, 1);
+
+      if (!isSphere) {
+        geometry.rotateZ(Math.PI / 2);
+      }
+
+      mesh = new THREE.Mesh(geometry, metallicMaterial);
+
+      // ラインで回転が見えるように装飾
+      const stripeMaterial = new THREE.LineBasicMaterial({ color: 0xf8fafc });
+      const stripeGeo = new THREE.EdgesGeometry(geometry);
+      const stripes = new THREE.LineSegments(stripeGeo, stripeMaterial);
+      mesh.add(stripes);
+    }
 
     this.object = mesh;
     this.contentGroup.add(mesh);
