@@ -21,6 +21,8 @@ let currentCamera = CAMERA_MODES.ANGLED;
 let latestParams = null;
 let isPendingStart = false;
 const CAMERA_CYCLE = [CAMERA_MODES.ANGLED, CAMERA_MODES.SIDE_HIGH, CAMERA_MODES.SIDE];
+let lastFinishedTime = 0;
+let wasRunning = false;
 const CAMERA_LABELS = {
   [CAMERA_MODES.ANGLED]: '視点: 斜め',
   [CAMERA_MODES.SIDE_HIGH]: '視点: ほぼ横',
@@ -69,11 +71,11 @@ function setPendingState(isPending) {
 
 function syncParams() {
   latestParams = getParams();
-  timeResult.textContent = latestParams.time.toFixed(2);
 }
 
 function previewSimulation(markPending = true) {
   syncParams();
+  lastFinishedTime = 0;
   simView.previewRun({
     shape: latestParams.shape,
     radius: latestParams.radius,
@@ -90,6 +92,7 @@ function startSimulation() {
   if (!latestParams) {
     syncParams();
   }
+  lastFinishedTime = 0;
   simView.startRun({
     shape: latestParams.shape,
     radius: latestParams.radius,
@@ -100,15 +103,28 @@ function startSimulation() {
   setPendingState(false);
 }
 
-  function toggleCamera() {
-    const currentIndex = CAMERA_CYCLE.indexOf(currentCamera);
-    currentCamera = CAMERA_CYCLE[(currentIndex + 1) % CAMERA_CYCLE.length];
-    simView.setCameraPreset(currentCamera);
-    updateViewLabel();
-  }
+function toggleCamera() {
+  const currentIndex = CAMERA_CYCLE.indexOf(currentCamera);
+  currentCamera = CAMERA_CYCLE[(currentIndex + 1) % CAMERA_CYCLE.length];
+  simView.setCameraPreset(currentCamera);
+  updateViewLabel();
+}
 
 function updateViewLabel() {
   viewToggle.textContent = CAMERA_LABELS[currentCamera];
+}
+
+function trackTime() {
+  if (simView.running) {
+    timeResult.textContent = simView.currentTime.toFixed(2);
+  } else {
+    if (wasRunning) {
+      lastFinishedTime = simView.currentTime;
+    }
+    timeResult.textContent = lastFinishedTime.toFixed(2);
+  }
+  wasRunning = simView.running;
+  requestAnimationFrame(trackTime);
 }
 
 angleInput.addEventListener('input', () => {
@@ -141,3 +157,4 @@ updateDisplayValues();
 updateThicknessState();
 previewSimulation(false);
 updateViewLabel();
+trackTime();
