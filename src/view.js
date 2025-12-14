@@ -79,8 +79,8 @@ export class SimulationView {
     const material = new THREE.MeshStandardMaterial({
       color: 0x0ea5e9,
       side: THREE.DoubleSide,
-      opacity: 0.8,
-      transparent: true,
+      opacity: 1,
+      transparent: false,
       metalness: 0.15,
       roughness: 0.35,
     });
