@@ -8,7 +8,6 @@ export class SimulationView {
   constructor(containerId) {
     this.container = document.getElementById(containerId);
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0xf5f5f5);
     this.clock = new THREE.Clock();
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
@@ -40,17 +39,14 @@ export class SimulationView {
   }
 
   addLights() {
-    const ambient = new THREE.AmbientLight(0xffffff, 0.55);
-    const dir = new THREE.DirectionalLight(0xffffff, 1);
-    dir.position.set(6, 8, 5);
-    dir.castShadow = true;
-    const fill = new THREE.DirectionalLight(0xffffff, 0.35);
-    fill.position.set(-4, 5, -3);
-    this.scene.add(ambient, dir, fill);
+    const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+    const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+    dir.position.set(4, 6, 5);
+    this.scene.add(ambient, dir);
   }
 
   addGround() {
-    const grid = new THREE.GridHelper(60, 30, 0xd1d5db, 0xd1d5db);
+    const grid = new THREE.GridHelper(60, 30, 0x1f2937, 0x1f2937);
     grid.position.y = -5;
     this.scene.add(grid);
   }
@@ -72,12 +68,12 @@ export class SimulationView {
     geometry.rotateX(-Math.PI / 2);
 
     const material = new THREE.MeshStandardMaterial({
-      color: 0xd1d5db,
+      color: 0x0ea5e9,
       side: THREE.DoubleSide,
-      opacity: 0.9,
+      opacity: 0.8,
       transparent: true,
-      metalness: 0.15,
-      roughness: 0.35,
+      metalness: 0.1,
+      roughness: 0.4,
     });
 
     this.rampMesh = new THREE.Mesh(geometry, material);
@@ -103,17 +99,11 @@ export class SimulationView {
       geometry.rotateZ(Math.PI / 2);
     }
 
-    const material = new THREE.MeshPhysicalMaterial({
-      color: 0xbfc7d5,
-      metalness: 0.85,
-      roughness: 0.28,
-      reflectivity: 0.9,
-      clearcoat: 0.35,
-    });
+    const material = new THREE.MeshStandardMaterial({ color: 0xf97316, metalness: 0.2, roughness: 0.45 });
     const mesh = new THREE.Mesh(geometry, material);
 
     // ラインで回転が見えるように装飾
-    const stripeMaterial = new THREE.LineBasicMaterial({ color: 0x111827 });
+    const stripeMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
     const stripeGeo = new THREE.EdgesGeometry(geometry);
     const stripes = new THREE.LineSegments(stripeGeo, stripeMaterial);
     mesh.add(stripes);
@@ -127,23 +117,12 @@ export class SimulationView {
     this.updateCameraFraming();
   }
 
-  preview(params) {
-    this.params = params;
-    this.currentTime = 0;
-    this.running = false;
-    this.createRamp(params.length, params.thetaRad);
-    this.createObject(params.shape, params.radius);
-    this.updateCameraFraming();
-    this.updateObjectPosition(0);
-  }
-
   startRun(params) {
     this.params = params;
     this.currentTime = 0;
     this.createRamp(params.length, params.thetaRad);
     this.createObject(params.shape, params.radius);
     this.updateCameraFraming();
-    this.updateObjectPosition(0);
     this.running = true;
     this.clock.start();
   }
