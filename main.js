@@ -6,7 +6,6 @@ const distanceInput = document.getElementById('distance');
 const diameterInput = document.getElementById('diameter');
 const thicknessInput = document.getElementById('thickness');
 const massInput = document.getElementById('mass');
-const shapeSelect = document.getElementById('shape');
 const shapeButtons = Array.from(document.querySelectorAll('.shape-choices button'));
 const startButton = document.getElementById('start');
 const viewToggle = document.getElementById('viewToggle');
@@ -24,6 +23,7 @@ let isPendingStart = false;
 const CAMERA_CYCLE = [CAMERA_MODES.ANGLED, CAMERA_MODES.SIDE_HIGH, CAMERA_MODES.SIDE];
 let lastFinishedTime = 0;
 let wasRunning = false;
+let currentShape = shapeButtons[0]?.dataset.shape ?? 'solidSphere';
 const CAMERA_LABELS = {
   [CAMERA_MODES.ANGLED]: '視点: 斜め',
   [CAMERA_MODES.SIDE_HIGH]: '視点: ほぼ横',
@@ -36,7 +36,7 @@ function updateLabel(input, labelEl, unit = '') {
 }
 
 function updateThicknessState() {
-  const isHollow = shapeSelect.value.includes('hollow');
+  const isHollow = currentShape.includes('hollow');
   thicknessInput.disabled = !isHollow;
   thicknessInput.parentElement.classList.toggle('muted', !isHollow);
 }
@@ -49,7 +49,7 @@ function getParams() {
   const radius = diameter / 2;
   const thickness = parseFloat(thicknessInput.value);
   const mass = parseFloat(massInput.value);
-  const shape = shapeSelect.value;
+  const shape = currentShape;
 
   const inertia = computeInertia(shape, { mass, radius, thickness });
   const acceleration = computeAcceleration({ thetaRad, inertia, mass, radius });
@@ -128,6 +128,13 @@ function trackTime() {
   requestAnimationFrame(trackTime);
 }
 
+function setShape(shape, { markPending = true } = {}) {
+  currentShape = shape;
+  shapeButtons.forEach((btn) => btn.classList.toggle('active', btn.dataset.shape === currentShape));
+  updateThicknessState();
+  previewSimulation(markPending);
+}
+
 angleInput.addEventListener('input', () => {
   updateDisplayValues();
   previewSimulation();
@@ -143,12 +150,6 @@ thicknessInput.addEventListener('input', () => {
   updateDisplayValues();
   previewSimulation();
 });
-shapeSelect.addEventListener('change', () => {
-  updateThicknessState();
-  updateDisplayValues();
-  previewSimulation();
-  shapeButtons.forEach((btn) => btn.classList.toggle('active', btn.dataset.shape === shapeSelect.value));
-});
 massInput.addEventListener('input', () => {
   previewSimulation();
 });
@@ -156,16 +157,12 @@ startButton.addEventListener('click', startSimulation);
 viewToggle.addEventListener('click', toggleCamera);
 
 updateDisplayValues();
-updateThicknessState();
-previewSimulation(false);
+setShape(currentShape, { markPending: false });
 updateViewLabel();
 trackTime();
 
 shapeButtons.forEach((button) => {
   button.addEventListener('click', () => {
-    shapeSelect.value = button.dataset.shape;
-    shapeSelect.dispatchEvent(new Event('change'));
+    setShape(button.dataset.shape);
   });
 });
-
-shapeSelect.dispatchEvent(new Event('change'));

@@ -64,16 +64,18 @@ header p {
 }
 
 .shape-choices {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 8px;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap;
 }
 
 .shape-choices button {
   display: flex;
   align-items: center;
   gap: 10px;
-  width: 100%;
+  flex: 1;
   padding: 10px 12px;
   border: 1px solid #1f2937;
   background: #0f172a;
@@ -81,6 +83,7 @@ header p {
   color: var(--text);
   box-shadow: none;
   transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+  transform-origin: center;
 }
 
 .shape-choices button svg {
@@ -94,7 +97,7 @@ header p {
 }
 
 .shape-choices button:hover {
-  transform: translateY(-2px);
+  transform: scale(1.5);
   border-color: #22d3ee;
   background: #0b132a;
 }
