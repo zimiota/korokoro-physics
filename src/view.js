@@ -73,8 +73,8 @@ export class SimulationView {
   updateRampScale(length) {
     if (!this.rampMesh) return;
 
-    const scaleZ = length / this.baseRampLength;
-    this.rampMesh.scale.set(1, 1, scaleZ);
+    const scaleY = length / this.baseRampLength;
+    this.rampMesh.scale.set(1, scaleY, 1);
   }
 
   createObject(shape, radius) {
