@@ -51,10 +51,7 @@ export class SimulationView {
       this.scene.remove(this.rampMesh);
     }
 
-    const geometry = new THREE.PlaneGeometry(length, 6, 1, 1);
-    geometry.rotateX(-Math.PI / 2 + thetaRad);
-    geometry.translate(0, (Math.sin(thetaRad) * length) / -2, 0);
-
+    const geometry = new THREE.PlaneGeometry(6, length, 1, 1);
     const material = new THREE.MeshStandardMaterial({
       color: 0x0ea5e9,
       side: THREE.DoubleSide,
@@ -65,6 +62,8 @@ export class SimulationView {
     });
 
     this.rampMesh = new THREE.Mesh(geometry, material);
+    this.rampMesh.rotation.x = -Math.PI / 2 + thetaRad; // UI 角度をラジアンで傾きに反映
+    this.rampMesh.position.y = (Math.sin(thetaRad) * length) / -2; // 長さ方向の中心を高さ補正
     this.scene.add(this.rampMesh);
   }
 
