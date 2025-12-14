@@ -51,6 +51,17 @@ header p {
   gap: 6px;
 }
 
+.shape-group {
+  grid-column: 1 / -1;
+}
+
+.slider-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  grid-column: 1 / -1;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
