@@ -88,9 +88,13 @@ angleInput.addEventListener('input', () => {
   startSimulation();
 });
 
-[distanceInput, diameterInput, thicknessInput].forEach((input) =>
-  input.addEventListener('input', () => updateDisplayValues())
+[distanceInput, diameterInput].forEach((input) =>
+  input.addEventListener('input', () => {
+    updateDisplayValues();
+    startSimulation();
+  })
 );
+thicknessInput.addEventListener('input', () => updateDisplayValues());
 shapeSelect.addEventListener('change', () => {
   updateThicknessState();
   updateDisplayValues();
