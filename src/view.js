@@ -94,9 +94,9 @@ export class SimulationView {
     }
 
     const material = new THREE.MeshStandardMaterial({
-      color: 0xf97316,
-      metalness: 0.65,
-      roughness: 0.2,
+      color: 0xc0c0c0,
+      metalness: 0.9,
+      roughness: 0.1,
     });
     const mesh = new THREE.Mesh(geometry, material);
 
