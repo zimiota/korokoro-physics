@@ -51,9 +51,23 @@ export class SimulationView {
       this.scene.remove(this.rampMesh);
     }
 
-    const geometry = new THREE.PlaneGeometry(length, 6, 1, 1);
-    geometry.rotateX(-Math.PI / 2 + thetaRad);
-    geometry.translate(0, (Math.sin(thetaRad) * length) / -2, 0);
+    const halfLength = length / 2;
+    const width = 6;
+    const heightAt = (z) => -Math.sin(thetaRad) * z;
+
+    const positions = new Float32Array([
+      -width / 2, heightAt(-halfLength), -halfLength,
+      width / 2, heightAt(-halfLength), -halfLength,
+      -width / 2, heightAt(halfLength), halfLength,
+      width / 2, heightAt(halfLength), halfLength,
+    ]);
+
+    const indices = [0, 2, 1, 2, 3, 1];
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setIndex(indices);
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.computeVertexNormals();
 
     const material = new THREE.MeshStandardMaterial({
       color: 0x0ea5e9,
@@ -102,7 +116,7 @@ export class SimulationView {
     } else {
       this.camera.position.set(-length * 0.6, height * 0.6, length);
     }
-    this.camera.lookAt(new THREE.Vector3(0, -height / 2, 0));
+    this.camera.lookAt(new THREE.Vector3(0, 0, 0));
   }
 
   startRun(params) {
