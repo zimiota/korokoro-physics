@@ -1,6 +1,7 @@
 const CAMERA_MODES = {
   ANGLED: 'angled',
   SIDE: 'side',
+  SIDE_HIGH: 'sideHigh',
 };
 
 export class SimulationView {
@@ -111,7 +112,7 @@ export class SimulationView {
     this.contentGroup.add(mesh);
   }
 
-  setCamera(mode) {
+  setCameraPreset(mode) {
     this.cameraMode = mode;
     this.updateCameraFraming();
   }
@@ -182,16 +183,26 @@ export class SimulationView {
     const widthDistance = paddedWidth / (2 * Math.tan(halfFov) * this.camera.aspect);
     const distance = Math.max(heightDistance, widthDistance) + paddedDepth * 0.5;
 
-    const angledDirection = new THREE.Vector3(-0.8, 0.45, 1).normalize();
-    const sideDirection = new THREE.Vector3(-0.25, 0.3, 1).normalize();
-    const offsetDirection = this.cameraMode === CAMERA_MODES.SIDE ? sideDirection : angledDirection;
-
+    const preset = this.getCameraPreset(this.cameraMode);
+    const offsetDirection = preset.direction.clone().normalize();
     const newPosition = center.clone().add(offsetDirection.multiplyScalar(distance));
     this.camera.position.copy(newPosition);
     this.camera.lookAt(center);
 
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(clientWidth, clientHeight);
+  }
+
+  getCameraPreset(mode) {
+    switch (mode) {
+      case CAMERA_MODES.SIDE:
+        return { direction: new THREE.Vector3(-0.25, 0.3, 1) };
+      case CAMERA_MODES.SIDE_HIGH:
+        return { direction: new THREE.Vector3(-1.15, 0.55, 0.35) };
+      case CAMERA_MODES.ANGLED:
+      default:
+        return { direction: new THREE.Vector3(-0.8, 0.45, 1) };
+    }
   }
 }
 
