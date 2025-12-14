@@ -8,9 +8,7 @@ export class SimulationView {
   constructor(containerId) {
     this.container = document.getElementById(containerId);
     this.scene = new THREE.Scene();
-    this.environmentMap = this.createEnvironmentMap();
-    this.scene.environment = this.environmentMap;
-    this.scene.background = this.environmentMap;
+    this.scene.background = new THREE.Color(0x000000);
     this.clock = new THREE.Clock();
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
@@ -36,44 +34,8 @@ export class SimulationView {
     this.rampNormal = new THREE.Vector3(0, 1, 0);
 
     this.addLights();
-    this.addGround();
     window.addEventListener('resize', () => this.handleResize());
     this.renderLoop();
-  }
-
-  createEnvironmentMap() {
-    const size = 256;
-    const createFace = (topColor, bottomColor) => {
-      const canvas = document.createElement('canvas');
-      canvas.width = size;
-      canvas.height = size;
-      const ctx = canvas.getContext('2d');
-      const gradient = ctx.createLinearGradient(0, 0, 0, size);
-      gradient.addColorStop(0, topColor);
-      gradient.addColorStop(1, bottomColor);
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, size, size);
-      return canvas;
-    };
-
-    const skyTop = '#b7d4ff';
-    const skyBottom = '#5b8fd8';
-    const horizon = '#e2e8f0';
-
-    const faces = [
-      createFace(skyTop, skyBottom),
-      createFace(skyTop, skyBottom),
-      createFace(skyTop, horizon),
-      createFace(horizon, '#b8c5d6'),
-      createFace(skyTop, skyBottom),
-      createFace(skyTop, skyBottom),
-    ];
-
-    const texture = new THREE.CubeTexture(faces);
-    texture.needsUpdate = true;
-    texture.colorSpace = THREE.SRGBColorSpace;
-    texture.generateMipmaps = true;
-    return texture;
   }
 
   addLights() {
@@ -81,12 +43,6 @@ export class SimulationView {
     const dir = new THREE.DirectionalLight(0xffffff, 0.8);
     dir.position.set(4, 6, 5);
     this.scene.add(ambient, dir);
-  }
-
-  addGround() {
-    const grid = new THREE.GridHelper(60, 30, 0x1f2937, 0x1f2937);
-    grid.position.y = -5;
-    this.scene.add(grid);
   }
 
   createRamp(length, thetaRad) {
@@ -112,8 +68,6 @@ export class SimulationView {
       transparent: true,
       metalness: 0.15,
       roughness: 0.35,
-      envMap: this.environmentMap,
-      envMapIntensity: 0.25,
     });
 
     this.rampMesh = new THREE.Mesh(geometry, material);
@@ -143,8 +97,6 @@ export class SimulationView {
       color: 0xf97316,
       metalness: 0.65,
       roughness: 0.2,
-      envMap: this.environmentMap,
-      envMapIntensity: 1.2,
     });
     const mesh = new THREE.Mesh(geometry, material);
 
