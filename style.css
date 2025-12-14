@@ -95,13 +95,14 @@ header p {
 }
 
 .shape-choices button svg {
-  width: 56px;
-  height: 56px;
+  width: 64px;
+  height: 64px;
   flex-shrink: 0;
 }
 
 .shape-choices button span {
   font-weight: 600;
+  font-size: 2rem;
 }
 
 .shape-choices button:hover {
