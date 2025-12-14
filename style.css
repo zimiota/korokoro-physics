@@ -1,9 +1,9 @@
 :root {
-  --bg: #f8fafc;
-  --panel: #ffffff;
+  --bg: #0f172a;
+  --panel: #111827;
   --accent: #22d3ee;
-  --text: #0f172a;
-  --muted: #4b5563;
+  --text: #e5e7eb;
+  --muted: #9ca3af;
 }
 
 * {
@@ -13,7 +13,9 @@
 body {
   margin: 0;
   font-family: 'Segoe UI', 'Hiragino Sans', system-ui, -apple-system, sans-serif;
-  background: var(--bg);
+  background: radial-gradient(circle at 20% 20%, rgba(34, 211, 238, 0.12), transparent 30%),
+    radial-gradient(circle at 80% 0%, rgba(94, 234, 212, 0.12), transparent 25%),
+    var(--bg);
   color: var(--text);
   min-height: 100vh;
 }
@@ -41,7 +43,7 @@ header p {
   background: var(--panel);
   padding: 16px;
   border-radius: 12px;
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
   margin-bottom: 16px;
 }
 
@@ -62,8 +64,8 @@ header p {
 .control-group input[type='number'] {
   padding: 8px;
   border-radius: 8px;
-  border: 1px solid #e5e7eb;
-  background: #f9fafb;
+  border: 1px solid #1f2937;
+  background: #0b1224;
   color: var(--text);
 }
 
@@ -78,17 +80,17 @@ button {
   padding: 10px 16px;
   border: none;
   border-radius: 10px;
-  background: linear-gradient(135deg, #22d3ee, #3b82f6);
-  color: #0f172a;
+  background: linear-gradient(135deg, #22d3ee, #8b5cf6);
+  color: #0b1020;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(34, 211, 238, 0.25);
+  box-shadow: 0 6px 18px rgba(34, 211, 238, 0.35);
   transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
 button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 10px 22px rgba(34, 211, 238, 0.25);
+  box-shadow: 0 10px 22px rgba(34, 211, 238, 0.35);
 }
 
 button:active {
@@ -101,10 +103,10 @@ button:active {
 }
 
 .view {
-  background: #f8fafc;
+  background: #0b1224;
   border-radius: 12px;
   padding: 8px;
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
 }
 
 #scene {
