@@ -4,6 +4,8 @@ const CAMERA_MODES = {
   SIDE_HIGH: 'sideHigh',
 };
 
+const CANVAS_SCALE = 1.3;
+
 export class SimulationView {
   constructor(containerId) {
     this.container = document.getElementById(containerId);
@@ -211,7 +213,8 @@ export class SimulationView {
     const halfFov = THREE.MathUtils.degToRad(this.camera.fov / 2);
     const heightDistance = paddedHeight / (2 * Math.tan(halfFov));
     const widthDistance = paddedWidth / (2 * Math.tan(halfFov) * this.camera.aspect);
-    const distance = Math.max(heightDistance, widthDistance) + paddedDepth * 0.5;
+    const distance =
+      (Math.max(heightDistance, widthDistance) + paddedDepth * 0.5) / CANVAS_SCALE;
 
     const preset = this.getCameraPreset(this.cameraMode);
     const offsetDirection = preset.direction.clone().normalize();
