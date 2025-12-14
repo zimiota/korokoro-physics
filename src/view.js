@@ -93,7 +93,9 @@ export class SimulationView {
     this.rampMesh.rotation.x = thetaRad;
     this.rampMesh.position.y = (length / 2) * Math.sin(thetaRad);
 
-    this.rampNormal = new THREE.Vector3(0, 1, 0).applyQuaternion(this.rampMesh.quaternion).normalize();
+    this.rampNormal = new THREE.Vector3(0, 0, 1)
+      .applyQuaternion(this.rampMesh.quaternion)
+      .normalize();
 
     this.rampAxes = new THREE.AxesHelper(3);
     this.rampMesh.add(this.rampAxes);
@@ -206,9 +208,10 @@ export class SimulationView {
     const { length, radius, acceleration } = this.params;
     const s = Math.min(0.5 * acceleration * t * t, length);
     const alongRamp = -length / 2 + s;
-    const localPos = new THREE.Vector3(0, radius, alongRamp);
+    const surfacePoint = new THREE.Vector3(0, 0, alongRamp);
     this.rampMesh.updateMatrixWorld(true);
-    const worldPos = this.rampMesh.localToWorld(localPos);
+    const worldSurfacePos = this.rampMesh.localToWorld(surfacePoint);
+    const worldPos = worldSurfacePos.clone().add(this.rampNormal.clone().multiplyScalar(radius));
 
     this.object.position.copy(worldPos);
 
