@@ -38,8 +38,8 @@ export class SimulationView {
     this.currentTime = 0;
     this.cameraMode = CAMERA_MODES.SIDE_HIGH;
     this.rampNormal = new THREE.Vector3(0, 1, 0);
-    this.rampStartZ = 0;
-    this.rampGoalZ = 0;
+    this.rampStartX = 0;
+    this.rampGoalX = 0;
 
     this.addLights();
     this.addGrid();
@@ -79,7 +79,7 @@ export class SimulationView {
       this.rampMesh.material.dispose();
     }
 
-    const geometry = new THREE.PlaneGeometry(width, length, 1, 1);
+    const geometry = new THREE.PlaneGeometry(length, width, 1, 1);
     geometry.rotateX(-Math.PI / 2);
 
     const material = new THREE.MeshStandardMaterial({
@@ -92,12 +92,12 @@ export class SimulationView {
     });
 
     this.rampMesh = new THREE.Mesh(geometry, material);
-    this.rampMesh.rotation.x = -thetaRad;
+    this.rampMesh.rotation.z = -thetaRad;
     const halfLength = length / 2;
     this.rampMesh.position.y = halfLength * Math.sin(thetaRad);
 
-    this.rampStartZ = halfLength;
-    this.rampGoalZ = -halfLength;
+    this.rampStartX = -halfLength;
+    this.rampGoalX = halfLength;
 
     this.rampNormal = new THREE.Vector3(0, 1, 0)
       .applyQuaternion(this.rampMesh.quaternion)
@@ -213,17 +213,17 @@ export class SimulationView {
   updateObjectPosition(t) {
     const { length, radius, acceleration } = this.params;
     const travel = Math.min(0.5 * acceleration * t * t, length);
-    const startZ = this.rampStartZ ?? length / 2;
-    const localZ = startZ - travel;
-    const localPos = new THREE.Vector3(0, radius, localZ);
+    const startX = this.rampStartX ?? -length / 2;
+    const localX = startX + travel;
+    const localPos = new THREE.Vector3(localX, radius, 0);
 
     this.rampMesh.updateMatrixWorld(true);
     const worldPos = this.rampMesh.localToWorld(localPos);
 
     this.object.position.copy(worldPos);
 
-    const rollDirection = Math.sign((this.rampGoalZ ?? -startZ) - startZ) || -1;
-    this.object.rotation.x = rollDirection * (travel / radius);
+    const rollDirection = Math.sign((this.rampGoalX ?? -startX) - startX) || 1;
+    this.object.rotation.set(0, 0, rollDirection * (travel / radius));
   }
 
   renderLoop() {
