@@ -60,6 +60,18 @@ function updateDisplayValues() {
   updateLabel(thicknessInput, thicknessValue);
 }
 
+function applyIdleState() {
+  const params = getParams();
+  timeResult.textContent = params.time.toFixed(2);
+  simView.preview({
+    shape: params.shape,
+    radius: params.radius,
+    thetaRad: params.thetaRad,
+    length: params.length,
+    acceleration: params.acceleration,
+  });
+}
+
 function startSimulation() {
   const params = getParams();
   timeResult.textContent = params.time.toFixed(2);
@@ -83,23 +95,20 @@ function updateViewLabel() {
   viewToggle.textContent = CAMERA_LABELS[currentCamera];
 }
 
-angleInput.addEventListener('input', () => {
-  updateDisplayValues();
-  startSimulation();
-});
-
-[distanceInput, diameterInput, thicknessInput].forEach((input) =>
-  input.addEventListener('input', () => updateDisplayValues())
-);
-shapeSelect.addEventListener('change', () => {
+function handleParamInput() {
   updateThicknessState();
   updateDisplayValues();
-});
-massInput.addEventListener('input', () => {});
+  applyIdleState();
+}
+
+[angleInput, distanceInput, diameterInput, thicknessInput, massInput].forEach((input) =>
+  input.addEventListener('input', handleParamInput)
+);
+shapeSelect.addEventListener('change', handleParamInput);
 startButton.addEventListener('click', startSimulation);
 viewToggle.addEventListener('click', toggleCamera);
 
 updateDisplayValues();
 updateThicknessState();
-startSimulation();
+applyIdleState();
 updateViewLabel();
