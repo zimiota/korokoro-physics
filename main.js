@@ -18,6 +18,8 @@ const thicknessValue = document.getElementById('thicknessValue');
 
 const simView = new SimulationView('scene');
 let currentCamera = CAMERA_MODES.ANGLED;
+let latestParams = null;
+let isPendingStart = false;
 const CAMERA_CYCLE = [CAMERA_MODES.ANGLED, CAMERA_MODES.SIDE_HIGH, CAMERA_MODES.SIDE];
 const CAMERA_LABELS = {
   [CAMERA_MODES.ANGLED]: '視点: 斜め',
@@ -60,16 +62,42 @@ function updateDisplayValues() {
   updateLabel(thicknessInput, thicknessValue);
 }
 
-function startSimulation() {
-  const params = getParams();
-  timeResult.textContent = params.time.toFixed(2);
-  simView.startRun({
-    shape: params.shape,
-    radius: params.radius,
-    thetaRad: params.thetaRad,
-    length: params.length,
-    acceleration: params.acceleration,
+function setPendingState(isPending) {
+  isPendingStart = isPending;
+  startButton.classList.toggle('pending-start', isPending);
+}
+
+function syncParams() {
+  latestParams = getParams();
+  timeResult.textContent = latestParams.time.toFixed(2);
+}
+
+function previewSimulation(markPending = true) {
+  syncParams();
+  simView.previewRun({
+    shape: latestParams.shape,
+    radius: latestParams.radius,
+    thetaRad: latestParams.thetaRad,
+    length: latestParams.length,
+    acceleration: latestParams.acceleration,
   });
+  if (markPending) {
+    setPendingState(true);
+  }
+}
+
+function startSimulation() {
+  if (!latestParams) {
+    syncParams();
+  }
+  simView.startRun({
+    shape: latestParams.shape,
+    radius: latestParams.radius,
+    thetaRad: latestParams.thetaRad,
+    length: latestParams.length,
+    acceleration: latestParams.acceleration,
+  });
+  setPendingState(false);
 }
 
   function toggleCamera() {
@@ -85,13 +113,13 @@ function updateViewLabel() {
 
 angleInput.addEventListener('input', () => {
   updateDisplayValues();
-  startSimulation();
+  previewSimulation();
 });
 
 [distanceInput, diameterInput].forEach((input) =>
   input.addEventListener('input', () => {
     updateDisplayValues();
-    startSimulation();
+    previewSimulation();
   })
 );
 thicknessInput.addEventListener('input', () => updateDisplayValues());
@@ -105,5 +133,5 @@ viewToggle.addEventListener('click', toggleCamera);
 
 updateDisplayValues();
 updateThicknessState();
-startSimulation();
+previewSimulation(false);
 updateViewLabel();

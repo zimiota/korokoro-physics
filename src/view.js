@@ -135,12 +135,18 @@ export class SimulationView {
     this.updateCameraFraming();
   }
 
-  startRun(params) {
+  previewRun(params) {
     this.params = params;
     this.currentTime = 0;
     this.createRamp(params.length, params.thetaRad);
     this.createObject(params.shape, params.radius);
     this.updateCameraFraming();
+    this.running = false;
+    this.updateObjectPosition(0);
+  }
+
+  startRun(params) {
+    this.previewRun(params);
     this.running = true;
     this.clock.start();
   }
