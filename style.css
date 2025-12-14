@@ -35,9 +35,9 @@ header p {
 }
 
 .controls {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
   background: var(--panel);
   padding: 16px;
   border-radius: 12px;
@@ -51,10 +51,15 @@ header p {
   gap: 6px;
 }
 
+.shape-group {
+  grid-column: 1 / -1;
+}
+
 .slider-controls {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px;
+  grid-column: 1 / -1;
 }
 
 .visually-hidden {
@@ -70,9 +75,9 @@ header p {
 }
 
 .shape-choices {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
 }
 
 .shape-choices button {
@@ -80,7 +85,6 @@ header p {
   align-items: center;
   gap: 10px;
   width: 100%;
-  flex: 1 1 0;
   padding: 10px 12px;
   border: 1px solid #1f2937;
   background: #0f172a;
@@ -132,19 +136,7 @@ header p {
   display: flex;
   align-items: center;
   gap: 12px;
-  flex-wrap: wrap;
-}
-
-.bottom-controls {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.mass-group {
-  min-width: 240px;
-  flex: 1 1 260px;
+  grid-column: 1 / -1;
 }
 
 button {

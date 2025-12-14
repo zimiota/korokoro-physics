@@ -16,7 +16,6 @@ const angleValue = document.getElementById('angleValue');
 const distanceValue = document.getElementById('distanceValue');
 const diameterValue = document.getElementById('diameterValue');
 const thicknessValue = document.getElementById('thicknessValue');
-const massValue = document.getElementById('massValue');
 
 const simView = new SimulationView('scene');
 let currentCamera = CAMERA_MODES.SIDE_HIGH;
@@ -64,7 +63,6 @@ function updateDisplayValues() {
   updateLabel(distanceInput, distanceValue);
   updateLabel(diameterInput, diameterValue);
   updateLabel(thicknessInput, thicknessValue);
-  updateLabel(massInput, massValue);
 }
 
 function setPendingState(isPending) {
@@ -152,7 +150,6 @@ shapeSelect.addEventListener('change', () => {
   shapeButtons.forEach((btn) => btn.classList.toggle('active', btn.dataset.shape === shapeSelect.value));
 });
 massInput.addEventListener('input', () => {
-  updateDisplayValues();
   previewSimulation();
 });
 startButton.addEventListener('click', startSimulation);
