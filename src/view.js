@@ -24,6 +24,7 @@ export class SimulationView {
 
     this.contentGroup = new THREE.Group();
     this.scene.add(this.contentGroup);
+    this.gridHelper = null;
     this.rampMesh = null;
     this.rampAxes = null;
     this.object = null;
@@ -47,14 +48,16 @@ export class SimulationView {
   }
 
   addGrid() {
-    const grid = new THREE.GridHelper(80, 40, 0x666666, 0x444444);
-    grid.position.y = -0.001;
-    const materials = Array.isArray(grid.material) ? grid.material : [grid.material];
+    this.gridHelper = new THREE.GridHelper(80, 40, 0x666666, 0x444444);
+    this.gridHelper.position.y = 0;
+    const materials = Array.isArray(this.gridHelper.material)
+      ? this.gridHelper.material
+      : [this.gridHelper.material];
     materials.forEach((material) => {
       material.transparent = true;
       material.opacity = 0.35;
     });
-    this.scene.add(grid);
+    this.scene.add(this.gridHelper);
   }
 
   createRamp(length, thetaRad) {
@@ -84,12 +87,17 @@ export class SimulationView {
 
     this.rampMesh = new THREE.Mesh(geometry, material);
     this.rampMesh.rotation.x = thetaRad;
+    this.rampMesh.position.y = (length / 2) * Math.sin(thetaRad);
 
     this.rampNormal = new THREE.Vector3(0, 1, 0).applyQuaternion(this.rampMesh.quaternion).normalize();
 
     this.rampAxes = new THREE.AxesHelper(3);
     this.rampMesh.add(this.rampAxes);
     this.contentGroup.add(this.rampMesh);
+
+    if (this.gridHelper) {
+      this.gridHelper.position.y = 0;
+    }
   }
 
   createObject(shape, radius) {
