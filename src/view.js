@@ -34,6 +34,7 @@ export class SimulationView {
     this.rampNormal = new THREE.Vector3(0, 1, 0);
 
     this.addLights();
+    this.addGrid();
     window.addEventListener('resize', () => this.handleResize());
     this.renderLoop();
   }
@@ -43,6 +44,17 @@ export class SimulationView {
     const dir = new THREE.DirectionalLight(0xffffff, 0.8);
     dir.position.set(4, 6, 5);
     this.scene.add(ambient, dir);
+  }
+
+  addGrid() {
+    const grid = new THREE.GridHelper(80, 40, 0x666666, 0x444444);
+    grid.position.y = -0.001;
+    const materials = Array.isArray(grid.material) ? grid.material : [grid.material];
+    materials.forEach((material) => {
+      material.transparent = true;
+      material.opacity = 0.35;
+    });
+    this.scene.add(grid);
   }
 
   createRamp(length, thetaRad) {
