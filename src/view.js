@@ -51,9 +51,9 @@ export class SimulationView {
       this.scene.remove(this.rampMesh);
     }
 
-    const geometry = new THREE.PlaneGeometry(length, 6, 1, 1);
+    const RAMP_WIDTH = 6;
+    const geometry = new THREE.PlaneGeometry(RAMP_WIDTH, length, 1, 1);
     geometry.rotateX(-Math.PI / 2 + thetaRad);
-    geometry.translate(0, (Math.sin(thetaRad) * length) / -2, 0);
 
     const material = new THREE.MeshStandardMaterial({
       color: 0x0ea5e9,
@@ -118,9 +118,11 @@ export class SimulationView {
   updateObjectPosition(t) {
     const { length, thetaRad, radius, acceleration } = this.params;
     const s = Math.min(0.5 * acceleration * t * t, length);
-    const z = -length / 2 + s;
-    const y = -Math.sin(thetaRad) * z + radius;
-    this.object.position.set(0, y, z);
+    const alongRamp = -length / 2 + s;
+    const forwardDirection = new THREE.Vector3(0, -Math.sin(thetaRad), Math.cos(thetaRad));
+    const position = forwardDirection.multiplyScalar(alongRamp);
+    position.y += radius;
+    this.object.position.copy(position);
 
     this.object.rotation.x = -(s / radius);
   }
