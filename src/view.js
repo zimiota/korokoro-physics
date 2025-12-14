@@ -5,6 +5,7 @@ const CAMERA_MODES = {
 };
 
 const CANVAS_SCALE = 1.3;
+const OBJECT_SCALE = 1.3;
 
 export class SimulationView {
   constructor(containerId) {
@@ -25,6 +26,7 @@ export class SimulationView {
     );
 
     this.contentGroup = new THREE.Group();
+    this.contentGroup.scale.setScalar(OBJECT_SCALE);
     this.scene.add(this.contentGroup);
     this.gridHelper = null;
     this.rampMesh = null;
@@ -74,7 +76,7 @@ export class SimulationView {
       this.rampMesh.material.dispose();
     }
 
-    const RAMP_WIDTH = 6;
+    const RAMP_WIDTH = 3;
     const geometry = new THREE.PlaneGeometry(RAMP_WIDTH, length, 1, 1);
     geometry.rotateX(-Math.PI / 2);
 
