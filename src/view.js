@@ -1,0 +1,151 @@
+const CAMERA_MODES = {
+  ANGLED: 'angled',
+  SIDE: 'side',
+};
+
+export class SimulationView {
+  constructor(containerId) {
+    this.container = document.getElementById(containerId);
+    this.scene = new THREE.Scene();
+    this.clock = new THREE.Clock();
+    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+    this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.container.appendChild(this.renderer.domElement);
+
+    this.camera = new THREE.PerspectiveCamera(
+      50,
+      this.container.clientWidth / this.container.clientHeight,
+      0.1,
+      200
+    );
+
+    this.rampMesh = null;
+    this.object = null;
+    this.running = false;
+    this.params = null;
+    this.currentTime = 0;
+    this.cameraMode = CAMERA_MODES.ANGLED;
+
+    this.addLights();
+    this.addGround();
+    window.addEventListener('resize', () => this.handleResize());
+    this.renderLoop();
+  }
+
+  addLights() {
+    const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+    const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+    dir.position.set(4, 6, 5);
+    this.scene.add(ambient, dir);
+  }
+
+  addGround() {
+    const grid = new THREE.GridHelper(60, 30, 0x1f2937, 0x1f2937);
+    grid.position.y = -5;
+    this.scene.add(grid);
+  }
+
+  createRamp(length, thetaRad) {
+    if (this.rampMesh) {
+      this.scene.remove(this.rampMesh);
+    }
+
+    const geometry = new THREE.PlaneGeometry(length, 6, 1, 1);
+    geometry.rotateX(-Math.PI / 2 + thetaRad);
+    geometry.translate(0, (Math.sin(thetaRad) * length) / -2, 0);
+
+    const material = new THREE.MeshStandardMaterial({
+      color: 0x0ea5e9,
+      side: THREE.DoubleSide,
+      opacity: 0.8,
+      transparent: true,
+      metalness: 0.1,
+      roughness: 0.4,
+    });
+
+    this.rampMesh = new THREE.Mesh(geometry, material);
+    this.scene.add(this.rampMesh);
+  }
+
+  createObject(shape, radius) {
+    if (this.object) {
+      this.scene.remove(this.object);
+    }
+
+    let geometry;
+    if (shape.includes('Sphere')) {
+      geometry = new THREE.SphereGeometry(radius, 32, 32);
+    } else {
+      geometry = new THREE.CylinderGeometry(radius, radius, radius * 1.2, 48, 1);
+      geometry.rotateZ(Math.PI / 2);
+    }
+
+    const material = new THREE.MeshStandardMaterial({ color: 0xf97316, metalness: 0.2, roughness: 0.45 });
+    const mesh = new THREE.Mesh(geometry, material);
+
+    // ラインで回転が見えるように装飾
+    const stripeMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
+    const stripeGeo = new THREE.EdgesGeometry(geometry);
+    const stripes = new THREE.LineSegments(stripeGeo, stripeMaterial);
+    mesh.add(stripes);
+
+    this.object = mesh;
+    this.scene.add(mesh);
+  }
+
+  setCamera(mode, length, thetaRad) {
+    this.cameraMode = mode;
+    const height = Math.sin(thetaRad) * length;
+    if (mode === CAMERA_MODES.SIDE) {
+      this.camera.position.set(-length * 0.2, height * 0.6, length * 1.2);
+    } else {
+      this.camera.position.set(-length * 0.6, height * 0.6, length);
+    }
+    this.camera.lookAt(new THREE.Vector3(0, -height / 2, 0));
+  }
+
+  startRun(params) {
+    this.params = params;
+    this.currentTime = 0;
+    this.createRamp(params.length, params.thetaRad);
+    this.createObject(params.shape, params.radius);
+    this.setCamera(this.cameraMode, params.length, params.thetaRad);
+    this.running = true;
+    this.clock.start();
+  }
+
+  updateObjectPosition(t) {
+    const { length, thetaRad, radius, acceleration } = this.params;
+    const s = Math.min(0.5 * acceleration * t * t, length);
+    const z = -length / 2 + s;
+    const y = -Math.sin(thetaRad) * z + radius;
+    this.object.position.set(0, y, z);
+
+    this.object.rotation.x = -(s / radius);
+  }
+
+  renderLoop() {
+    requestAnimationFrame(() => this.renderLoop());
+    if (this.running && this.params) {
+      const delta = this.clock.getDelta();
+      this.currentTime += delta;
+      const travel = 0.5 * this.params.acceleration * this.currentTime * this.currentTime;
+      if (travel >= this.params.length) {
+        this.running = false;
+        this.currentTime = Math.sqrt((2 * this.params.length) / this.params.acceleration);
+      }
+      this.updateObjectPosition(this.currentTime);
+    }
+    this.renderer.render(this.scene, this.camera);
+  }
+
+  handleResize() {
+    const { clientWidth, clientHeight } = this.container;
+    this.camera.aspect = clientWidth / clientHeight;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(clientWidth, clientHeight);
+  }
+}
+
+export { CAMERA_MODES };

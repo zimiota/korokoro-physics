@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ころころ物理シミュレーション</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.min.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>ころころ物理シミュレーション</h1>
+      <p>坂を転がる物体の理論計算と簡易2.5Dビュー</p>
+    </header>
+
+    <section class="controls">
+      <div class="control-group">
+        <label for="shape">形状</label>
+        <select id="shape">
+          <option value="solidSphere">中実球</option>
+          <option value="hollowSphere">中空球</option>
+          <option value="solidCylinder">中実円柱</option>
+          <option value="hollowCylinder">中空円柱</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label for="angle">角度 θ (<span id="angleValue">15</span>°)</label>
+        <input type="range" id="angle" min="5" max="45" step="1" value="15" />
+      </div>
+
+      <div class="control-group">
+        <label for="distance">坂の距離 L (<span id="distanceValue">10</span> m)</label>
+        <input type="range" id="distance" min="2" max="40" step="1" value="10" />
+      </div>
+
+      <div class="control-group">
+        <label for="diameter">直径 (<span id="diameterValue">0.5</span> m)</label>
+        <input type="range" id="diameter" min="0.1" max="2" step="0.05" value="0.5" />
+      </div>
+
+      <div class="control-group">
+        <label for="thickness">肉厚 (<span id="thicknessValue">0.05</span> m)</label>
+        <input type="range" id="thickness" min="0.01" max="0.5" step="0.01" value="0.05" />
+      </div>
+
+      <div class="control-group">
+        <label for="mass">質量 (kg)</label>
+        <input type="number" id="mass" min="0.1" step="0.1" value="1.0" />
+      </div>
+
+      <div class="control-row">
+        <button id="start">再生</button>
+        <button id="viewToggle">視点切替</button>
+        <div class="result">到達時間: <span id="timeResult">--</span> s</div>
+      </div>
+    </section>
+
+    <section class="view">
+      <div id="scene"></div>
+    </section>
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
