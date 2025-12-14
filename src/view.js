@@ -6,6 +6,7 @@ const CAMERA_MODES = {
 
 const CANVAS_SCALE = 1.3;
 const OBJECT_SCALE = 1.3;
+const DEFAULT_RAMP_WIDTH = 3;
 
 export class SimulationView {
   constructor(containerId) {
@@ -37,6 +38,8 @@ export class SimulationView {
     this.currentTime = 0;
     this.cameraMode = CAMERA_MODES.SIDE_HIGH;
     this.rampNormal = new THREE.Vector3(0, 1, 0);
+    this.rampStartZ = 0;
+    this.rampGoalZ = 0;
 
     this.addLights();
     this.addGrid();
@@ -64,7 +67,7 @@ export class SimulationView {
     this.scene.add(this.gridHelper);
   }
 
-  createRamp(length, thetaRad) {
+  createRamp(length, thetaRad, width = DEFAULT_RAMP_WIDTH) {
     if (this.rampMesh) {
       this.contentGroup.remove(this.rampMesh);
       if (this.rampAxes) {
@@ -76,8 +79,7 @@ export class SimulationView {
       this.rampMesh.material.dispose();
     }
 
-    const RAMP_WIDTH = 3;
-    const geometry = new THREE.PlaneGeometry(RAMP_WIDTH, length, 1, 1);
+    const geometry = new THREE.PlaneGeometry(width, length, 1, 1);
     geometry.rotateX(-Math.PI / 2);
 
     const material = new THREE.MeshStandardMaterial({
@@ -90,8 +92,12 @@ export class SimulationView {
     });
 
     this.rampMesh = new THREE.Mesh(geometry, material);
-    this.rampMesh.rotation.x = thetaRad;
-    this.rampMesh.position.y = (length / 2) * Math.sin(thetaRad);
+    this.rampMesh.rotation.x = -thetaRad;
+    const halfLength = length / 2;
+    this.rampMesh.position.y = halfLength * Math.sin(thetaRad);
+
+    this.rampStartZ = halfLength;
+    this.rampGoalZ = -halfLength;
 
     this.rampNormal = new THREE.Vector3(0, 1, 0)
       .applyQuaternion(this.rampMesh.quaternion)
@@ -184,10 +190,10 @@ export class SimulationView {
 
   previewRun(params) {
     this.stopRun();
-    this.params = params;
+    this.params = { ...params, width: params.width ?? DEFAULT_RAMP_WIDTH };
     this.currentTime = 0;
-    this.createRamp(params.length, params.thetaRad);
-    this.createObject(params.shape, params.radius);
+    this.createRamp(this.params.length, this.params.thetaRad, this.params.width);
+    this.createObject(this.params.shape, this.params.radius);
     this.updateCameraFraming();
     this.running = false;
     this.updateObjectPosition(0);
@@ -206,16 +212,18 @@ export class SimulationView {
 
   updateObjectPosition(t) {
     const { length, radius, acceleration } = this.params;
-    const s = Math.min(0.5 * acceleration * t * t, length);
-    const alongRamp = length / 2 - s;
-    const surfacePoint = new THREE.Vector3(0, 0, alongRamp);
+    const travel = Math.min(0.5 * acceleration * t * t, length);
+    const startZ = this.rampStartZ ?? length / 2;
+    const localZ = startZ - travel;
+    const localPos = new THREE.Vector3(0, radius, localZ);
+
     this.rampMesh.updateMatrixWorld(true);
-    const worldSurfacePos = this.rampMesh.localToWorld(surfacePoint);
-    const worldPos = worldSurfacePos.clone().add(this.rampNormal.clone().multiplyScalar(radius));
+    const worldPos = this.rampMesh.localToWorld(localPos);
 
     this.object.position.copy(worldPos);
 
-    this.object.rotation.x = -(s / radius);
+    const rollDirection = Math.sign((this.rampGoalZ ?? -startZ) - startZ) || -1;
+    this.object.rotation.x = rollDirection * (travel / radius);
   }
 
   renderLoop() {
