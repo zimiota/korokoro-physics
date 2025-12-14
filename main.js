@@ -19,7 +19,7 @@ const thicknessValue = document.getElementById('thicknessValue');
 const massValue = document.getElementById('massValue');
 
 const simView = new SimulationView('scene');
-let currentCamera = CAMERA_MODES.ANGLED;
+let currentCamera = CAMERA_MODES.SIDE_HIGH;
 let latestParams = null;
 let isPendingStart = false;
 const CAMERA_CYCLE = [CAMERA_MODES.ANGLED, CAMERA_MODES.SIDE_HIGH, CAMERA_MODES.SIDE];
