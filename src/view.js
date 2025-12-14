@@ -108,9 +108,9 @@ export class SimulationView {
     }
 
     const metallicMaterial = new THREE.MeshStandardMaterial({
-      color: 0xaeb4be,
-      metalness: 0.9,
-      roughness: 0.25,
+      color: 0xd4af37,
+      metalness: 1,
+      roughness: 0.15,
     });
 
     const isSphere = shape.includes('Sphere');
