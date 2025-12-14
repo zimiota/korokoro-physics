@@ -27,6 +27,7 @@ export class SimulationView {
     this.currentTime = 0;
     this.cameraMode = CAMERA_MODES.ANGLED;
     this.baseRampLength = 10;
+    this.rampNormal = new THREE.Vector3(0, 1, 0);
 
     this.addLights();
     this.addGround();
@@ -55,6 +56,8 @@ export class SimulationView {
     const RAMP_WIDTH = 6;
     const geometry = new THREE.PlaneGeometry(RAMP_WIDTH, this.baseRampLength, 1, 1);
     geometry.rotateX(Math.PI / 2 + thetaRad);
+
+    this.rampNormal = new THREE.Vector3(0, -Math.cos(thetaRad), -Math.sin(thetaRad));
 
     const material = new THREE.MeshStandardMaterial({
       color: 0x0ea5e9,
@@ -130,7 +133,14 @@ export class SimulationView {
     const alongRamp = -length / 2 + s;
     const forwardDirection = new THREE.Vector3(0, -Math.sin(thetaRad), Math.cos(thetaRad));
     const position = forwardDirection.multiplyScalar(alongRamp);
-    position.y += radius;
+
+    const contactOffset = (this.rampNormal || new THREE.Vector3(0, 1, 0))
+      .clone()
+      .negate()
+      .normalize()
+      .multiplyScalar(radius);
+
+    position.add(contactOffset);
     this.object.position.copy(position);
 
     this.object.rotation.x = -(s / radius);
