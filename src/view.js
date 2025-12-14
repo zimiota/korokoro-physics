@@ -26,9 +26,12 @@ export class SimulationView {
     this.params = null;
     this.currentTime = 0;
     this.cameraMode = CAMERA_MODES.ANGLED;
+    this.baseRampLength = 10;
+    this.axesHelper = null;
 
     this.addLights();
     this.addGround();
+    this.addAxesHelper();
     window.addEventListener('resize', () => this.handleResize());
     this.renderLoop();
   }
@@ -46,13 +49,21 @@ export class SimulationView {
     this.scene.add(grid);
   }
 
+  addAxesHelper() {
+    if (this.axesHelper) {
+      this.scene.remove(this.axesHelper);
+    }
+    this.axesHelper = new THREE.AxesHelper(8);
+    this.scene.add(this.axesHelper);
+  }
+
   createRamp(length, thetaRad) {
     if (this.rampMesh) {
       this.scene.remove(this.rampMesh);
     }
 
     const RAMP_WIDTH = 6;
-    const geometry = new THREE.PlaneGeometry(RAMP_WIDTH, length, 1, 1);
+    const geometry = new THREE.PlaneGeometry(RAMP_WIDTH, this.baseRampLength, 1, 1);
     geometry.rotateX(-Math.PI / 2 + thetaRad);
 
     const material = new THREE.MeshStandardMaterial({
@@ -65,7 +76,15 @@ export class SimulationView {
     });
 
     this.rampMesh = new THREE.Mesh(geometry, material);
+    this.updateRampScale(length);
     this.scene.add(this.rampMesh);
+  }
+
+  updateRampScale(length) {
+    if (!this.rampMesh) return;
+
+    const scaleZ = length / this.baseRampLength;
+    this.rampMesh.scale.set(1, 1, scaleZ);
   }
 
   createObject(shape, radius) {
@@ -129,6 +148,9 @@ export class SimulationView {
 
   renderLoop() {
     requestAnimationFrame(() => this.renderLoop());
+    if (this.params && this.rampMesh) {
+      this.updateRampScale(this.params.length);
+    }
     if (this.running && this.params) {
       const delta = this.clock.getDelta();
       this.currentTime += delta;
