@@ -174,8 +174,8 @@ export class SimulationView {
 
   renderLoop() {
     requestAnimationFrame(() => this.renderLoop());
+    const delta = this.clock.getDelta();
     if (this.running && this.params) {
-      const delta = this.clock.getDelta();
       this.currentTime += delta;
       const travel = 0.5 * this.params.acceleration * this.currentTime * this.currentTime;
       if (travel >= this.params.length) {
