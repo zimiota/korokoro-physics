@@ -17,12 +17,70 @@
     <section class="controls">
       <div class="control-group">
         <label for="shape">形状</label>
-        <select id="shape">
+        <select id="shape" class="visually-hidden">
           <option value="solidSphere">中実球</option>
           <option value="hollowSphere">中空球</option>
           <option value="solidCylinder">中実円柱</option>
           <option value="hollowCylinder">中空円柱</option>
         </select>
+        <div class="shape-choices" aria-label="形状の選択">
+          <button type="button" data-shape="solidSphere">
+            <svg viewBox="0 0 80 80" aria-hidden="true">
+              <defs>
+                <radialGradient id="solidSphereGradient" cx="30%" cy="30%" r="70%">
+                  <stop offset="0%" stop-color="#eef2ff" />
+                  <stop offset="50%" stop-color="#c7d2fe" />
+                  <stop offset="100%" stop-color="#818cf8" />
+                </radialGradient>
+              </defs>
+              <circle cx="40" cy="40" r="26" fill="url(#solidSphereGradient)" stroke="#ffffff" stroke-width="2" />
+            </svg>
+            <span>中実球</span>
+          </button>
+          <button type="button" data-shape="hollowSphere">
+            <svg viewBox="0 0 80 80" aria-hidden="true">
+              <defs>
+                <radialGradient id="hollowSphereGradient" cx="30%" cy="30%" r="70%">
+                  <stop offset="0%" stop-color="#dbeafe" />
+                  <stop offset="50%" stop-color="#93c5fd" />
+                  <stop offset="100%" stop-color="#3b82f6" />
+                </radialGradient>
+              </defs>
+              <circle cx="40" cy="40" r="26" fill="none" stroke="url(#hollowSphereGradient)" stroke-width="6" />
+              <circle cx="40" cy="40" r="8" fill="#1e40af" opacity="0.65" />
+            </svg>
+            <span>中空球</span>
+          </button>
+          <button type="button" data-shape="solidCylinder">
+            <svg viewBox="0 0 80 80" aria-hidden="true">
+              <defs>
+                <linearGradient id="solidCylinderGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#a5b4fc" />
+                  <stop offset="100%" stop-color="#6366f1" />
+                </linearGradient>
+              </defs>
+              <rect x="20" y="22" width="40" height="36" rx="12" fill="url(#solidCylinderGradient)" stroke="#ffffff" stroke-width="2" />
+              <ellipse cx="40" cy="22" rx="20" ry="6" fill="#c7d2fe" stroke="#ffffff" stroke-width="2" />
+              <ellipse cx="40" cy="58" rx="20" ry="6" fill="#818cf8" stroke="#ffffff" stroke-width="2" />
+            </svg>
+            <span>中実円柱</span>
+          </button>
+          <button type="button" data-shape="hollowCylinder">
+            <svg viewBox="0 0 80 80" aria-hidden="true">
+              <defs>
+                <linearGradient id="hollowCylinderGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#7dd3fc" />
+                  <stop offset="100%" stop-color="#38bdf8" />
+                </linearGradient>
+              </defs>
+              <rect x="20" y="22" width="40" height="36" rx="12" fill="none" stroke="url(#hollowCylinderGradient)" stroke-width="5" />
+              <ellipse cx="40" cy="22" rx="20" ry="6" fill="none" stroke="#bae6fd" stroke-width="4" />
+              <ellipse cx="40" cy="58" rx="20" ry="6" fill="none" stroke="#0ea5e9" stroke-width="4" />
+              <ellipse cx="40" cy="40" rx="8" ry="6" fill="#0ea5e9" opacity="0.5" />
+            </svg>
+            <span>中空円柱</span>
+          </button>
+        </div>
       </div>
 
       <div class="control-group">

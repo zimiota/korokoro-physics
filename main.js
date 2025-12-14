@@ -7,6 +7,7 @@ const diameterInput = document.getElementById('diameter');
 const thicknessInput = document.getElementById('thickness');
 const massInput = document.getElementById('mass');
 const shapeSelect = document.getElementById('shape');
+const shapeButtons = Array.from(document.querySelectorAll('.shape-choices button'));
 const startButton = document.getElementById('start');
 const viewToggle = document.getElementById('viewToggle');
 const timeResult = document.getElementById('timeResult');
@@ -146,6 +147,7 @@ shapeSelect.addEventListener('change', () => {
   updateThicknessState();
   updateDisplayValues();
   previewSimulation();
+  shapeButtons.forEach((btn) => btn.classList.toggle('active', btn.dataset.shape === shapeSelect.value));
 });
 massInput.addEventListener('input', () => {
   previewSimulation();
@@ -158,3 +160,12 @@ updateThicknessState();
 previewSimulation(false);
 updateViewLabel();
 trackTime();
+
+shapeButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    shapeSelect.value = button.dataset.shape;
+    shapeSelect.dispatchEvent(new Event('change'));
+  });
+});
+
+shapeSelect.dispatchEvent(new Event('change'));
