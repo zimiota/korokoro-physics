@@ -21,6 +21,7 @@ export class SimulationView {
     );
 
     this.rampMesh = null;
+    this.rampAxes = null;
     this.object = null;
     this.running = false;
     this.params = null;
@@ -51,13 +52,16 @@ export class SimulationView {
   createRamp(length, thetaRad) {
     if (this.rampMesh) {
       this.scene.remove(this.rampMesh);
+      if (this.rampAxes) {
+        this.rampMesh.remove(this.rampAxes);
+        this.scene.remove(this.rampAxes);
+        this.rampAxes = null;
+      }
     }
 
     const RAMP_WIDTH = 6;
     const geometry = new THREE.PlaneGeometry(RAMP_WIDTH, this.baseRampLength, 1, 1);
-    geometry.rotateX(Math.PI / 2 + thetaRad);
-
-    this.rampNormal = new THREE.Vector3(0, -Math.cos(thetaRad), -Math.sin(thetaRad));
+    geometry.rotateX(-Math.PI / 2);
 
     const material = new THREE.MeshStandardMaterial({
       color: 0x0ea5e9,
@@ -69,15 +73,21 @@ export class SimulationView {
     });
 
     this.rampMesh = new THREE.Mesh(geometry, material);
+    this.rampMesh.rotation.x = thetaRad;
     this.updateRampScale(length);
+
+    this.rampNormal = new THREE.Vector3(0, 1, 0).applyQuaternion(this.rampMesh.quaternion).normalize();
+
+    this.rampAxes = new THREE.AxesHelper(3);
+    this.rampMesh.add(this.rampAxes);
     this.scene.add(this.rampMesh);
   }
 
   updateRampScale(length) {
     if (!this.rampMesh) return;
 
-    const scaleY = length / this.baseRampLength;
-    this.rampMesh.scale.set(1, scaleY, 1);
+    const scaleZ = length / this.baseRampLength;
+    this.rampMesh.scale.set(1, 1, scaleZ);
   }
 
   createObject(shape, radius) {
@@ -128,20 +138,14 @@ export class SimulationView {
   }
 
   updateObjectPosition(t) {
-    const { length, thetaRad, radius, acceleration } = this.params;
+    const { length, radius, acceleration } = this.params;
     const s = Math.min(0.5 * acceleration * t * t, length);
     const alongRamp = -length / 2 + s;
-    const forwardDirection = new THREE.Vector3(0, -Math.sin(thetaRad), Math.cos(thetaRad));
-    const position = forwardDirection.multiplyScalar(alongRamp);
+    const localPos = new THREE.Vector3(0, radius, alongRamp);
+    this.rampMesh.updateMatrixWorld(true);
+    const worldPos = this.rampMesh.localToWorld(localPos);
 
-    const contactOffset = (this.rampNormal || new THREE.Vector3(0, 1, 0))
-      .clone()
-      .negate()
-      .normalize()
-      .multiplyScalar(radius);
-
-    position.add(contactOffset);
-    this.object.position.copy(position);
+    this.object.position.copy(worldPos);
 
     this.object.rotation.x = -(s / radius);
   }
