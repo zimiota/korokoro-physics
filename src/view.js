@@ -28,6 +28,7 @@ export class SimulationView {
     this.cameraMode = CAMERA_MODES.ANGLED;
     this.baseRampLength = 10;
     this.axesHelper = null;
+    this.renderRadius = null;
 
     this.addLights();
     this.addGround();
@@ -92,11 +93,14 @@ export class SimulationView {
       this.scene.remove(this.object);
     }
 
+    const renderRadiusScale = 1.4;
+    const renderRadius = radius * renderRadiusScale;
+
     let geometry;
     if (shape.includes('Sphere')) {
-      geometry = new THREE.SphereGeometry(radius, 32, 32);
+      geometry = new THREE.SphereGeometry(renderRadius, 32, 32);
     } else {
-      geometry = new THREE.CylinderGeometry(radius, radius, radius * 1.2, 48, 1);
+      geometry = new THREE.CylinderGeometry(renderRadius, renderRadius, renderRadius * 1.2, 48, 1);
       geometry.rotateZ(Math.PI / 2);
     }
 
@@ -109,6 +113,7 @@ export class SimulationView {
     const stripes = new THREE.LineSegments(stripeGeo, stripeMaterial);
     mesh.add(stripes);
 
+    this.renderRadius = renderRadius;
     this.object = mesh;
     this.scene.add(mesh);
   }
@@ -140,7 +145,7 @@ export class SimulationView {
     const alongRamp = -length / 2 + s;
     const forwardDirection = new THREE.Vector3(0, -Math.sin(thetaRad), Math.cos(thetaRad));
     const position = forwardDirection.multiplyScalar(alongRamp);
-    position.y += radius;
+    position.y += this.renderRadius ?? radius;
     this.object.position.copy(position);
 
     this.object.rotation.x = -(s / radius);
