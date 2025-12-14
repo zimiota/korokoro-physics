@@ -122,12 +122,18 @@ angleInput.addEventListener('input', () => {
     previewSimulation();
   })
 );
-thicknessInput.addEventListener('input', () => updateDisplayValues());
+thicknessInput.addEventListener('input', () => {
+  updateDisplayValues();
+  previewSimulation();
+});
 shapeSelect.addEventListener('change', () => {
   updateThicknessState();
   updateDisplayValues();
+  previewSimulation();
 });
-massInput.addEventListener('input', () => {});
+massInput.addEventListener('input', () => {
+  previewSimulation();
+});
 startButton.addEventListener('click', startSimulation);
 viewToggle.addEventListener('click', toggleCamera);
 
