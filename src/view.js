@@ -136,6 +136,7 @@ export class SimulationView {
   }
 
   previewRun(params) {
+    this.stopRun();
     this.params = params;
     this.currentTime = 0;
     this.createRamp(params.length, params.thetaRad);
@@ -149,6 +150,11 @@ export class SimulationView {
     this.previewRun(params);
     this.running = true;
     this.clock.start();
+  }
+
+  stopRun() {
+    this.running = false;
+    this.clock.stop();
   }
 
   updateObjectPosition(t) {
