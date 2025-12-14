@@ -27,11 +27,9 @@ export class SimulationView {
     this.currentTime = 0;
     this.cameraMode = CAMERA_MODES.ANGLED;
     this.baseRampLength = 10;
-    this.axesHelper = null;
 
     this.addLights();
     this.addGround();
-    this.addAxesHelper();
     window.addEventListener('resize', () => this.handleResize());
     this.renderLoop();
   }
@@ -49,14 +47,6 @@ export class SimulationView {
     this.scene.add(grid);
   }
 
-  addAxesHelper() {
-    if (this.axesHelper) {
-      this.scene.remove(this.axesHelper);
-    }
-    this.axesHelper = new THREE.AxesHelper(8);
-    this.scene.add(this.axesHelper);
-  }
-
   createRamp(length, thetaRad) {
     if (this.rampMesh) {
       this.scene.remove(this.rampMesh);
@@ -64,7 +54,7 @@ export class SimulationView {
 
     const RAMP_WIDTH = 6;
     const geometry = new THREE.PlaneGeometry(RAMP_WIDTH, this.baseRampLength, 1, 1);
-    geometry.rotateX(-Math.PI / 2 + thetaRad);
+    geometry.rotateX(Math.PI / 2 + thetaRad);
 
     const material = new THREE.MeshStandardMaterial({
       color: 0x0ea5e9,
