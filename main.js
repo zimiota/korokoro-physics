@@ -18,6 +18,12 @@ const thicknessValue = document.getElementById('thicknessValue');
 
 const simView = new SimulationView('scene');
 let currentCamera = CAMERA_MODES.ANGLED;
+const CAMERA_CYCLE = [CAMERA_MODES.ANGLED, CAMERA_MODES.SIDE_HIGH, CAMERA_MODES.SIDE];
+const CAMERA_LABELS = {
+  [CAMERA_MODES.ANGLED]: '視点: 斜め',
+  [CAMERA_MODES.SIDE_HIGH]: '視点: ほぼ横',
+  [CAMERA_MODES.SIDE]: '視点: 真横',
+};
 
 function updateLabel(input, labelEl, unit = '') {
   labelEl.textContent = parseFloat(input.value).toString();
@@ -66,10 +72,15 @@ function startSimulation() {
   });
 }
 
-function toggleCamera() {
-  currentCamera = currentCamera === CAMERA_MODES.ANGLED ? CAMERA_MODES.SIDE : CAMERA_MODES.ANGLED;
-  const params = getParams();
-  simView.setCamera(currentCamera);
+  function toggleCamera() {
+    const currentIndex = CAMERA_CYCLE.indexOf(currentCamera);
+    currentCamera = CAMERA_CYCLE[(currentIndex + 1) % CAMERA_CYCLE.length];
+    simView.setCameraPreset(currentCamera);
+    updateViewLabel();
+  }
+
+function updateViewLabel() {
+  viewToggle.textContent = CAMERA_LABELS[currentCamera];
 }
 
 angleInput.addEventListener('input', () => {
@@ -91,3 +102,4 @@ viewToggle.addEventListener('click', toggleCamera);
 updateDisplayValues();
 updateThicknessState();
 startSimulation();
+updateViewLabel();
